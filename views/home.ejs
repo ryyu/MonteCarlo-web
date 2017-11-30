@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title><%= title %></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
+    <script>
+        sessionStorage.setItem('totalClicks', '0'); // session storage always stores values as strings
+        sessionStorage.setItem('count', '0');
+    </script>
+</head>
+<body>
+
+<div class="column left" id="drawContainer">
+
+    <canvas id="monte"></canvas>
+
+
+</div>
+
+<div class="column right">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
+        <li><a data-toggle="tab" href="#menu1">Menu 1</a></li>
+        <li><a data-toggle="tab" href="#menu2">Menu 2</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane fade in active">
+            <h3>HOME</h3>
+            <p>Some content.</p>
+        </div>
+        <div id="menu1" class="tab-pane fade">
+            <h3>Menu 1</h3>
+            <p>Some content in menu 1.</p>
+        </div>
+        <div id="menu2" class="tab-pane fade">
+            <h3>Menu 2</h3>
+            <p>Some content in menu 2.</p>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#">Home</a></li>
+        <li><a href="#">Menu 1</a></li>
+        <li><a href="#">Menu 2</a></li>
+        <li><a href="#">Menu 3</a></li>
+    </ul>
+
+</div>
+
+
+<script>
+    //drawBackground();
+    draw();
+    document.addEventListener("click", getMousePos);
+
+    function otherInfo () {
+        console.log("clicked in background canvas");
+    }
+
+    function generatePoints() {
+        var canvas = document.getElementById("monte").getBoundingClientRect();
+        var cWidth = canvas.width;
+        var cHeight = canvas.height;
+        for (var i = 0; i < 1000; i++) {
+            var x = Math.floor(Math.random() * cWidth);
+            var y = Math.floor(Math.random() * cHeight);
+            drawMarker(x, y);
+            sessionStorage.setItem('totalClicks', parseInt(sessionStorage.getItem('totalClicks')) + 1);
+            var radius = (canvas.width / 2);
+            var originX = canvas.right - (canvas.width / 2);
+            var originY = canvas.bottom - (canvas.height / 2);
+            var dist = distance(x, originX, y, originY);
+
+            if (dist < radius) {
+                // point is inside the circle!!
+                sessionStorage.setItem('count', parseInt(sessionStorage.getItem('count')) + 1);
+            }
+
+        }
+        finalMonte();
+    }
+
+    function drawCircle() {
+        var canvas = document.getElementById("circle");
+        var col = document.getElementById("drawContainer").getBoundingClientRect();
+        console.log("col height: ", col.height, "col width: ", col.width);
+        cWidth = col.width;
+        cHeight = col.height;
+        //canvas.width = col.width;
+        //canvas.height = col.width;
+
+        if (cWidth <= cHeight) {
+            canvas.width = cWidth;
+            canvas.height = cWidth;
+        }
+        else if (cWidth > cHeight) {
+            canvas.width = cHeight;
+            canvas.height = cHeight;
+        }
+        else {
+            canvas.height = 300;
+            canvas.width = 300;
+            console.log("an error has occured setting the width and height of the canvas element. Default of 300x300 chosen.")
+        }
+
+        var context = canvas.getContext("2d");
+        const specs = canvas.getBoundingClientRect();
+        context.fillStyle = '#70A9A1';
+        context.beginPath();
+        context.arc(specs.width / 2, specs.height / 2, (specs.width / 2 )- 1, 0 ,2*Math.PI); // Circle!
+        // note: coordinates are relative to its container.
+        context.fill();
+
+    }
+
+    function drawBackground() {
+        var canvas = document.getElementById("backgroundCanvas");
+        var col = document.getElementById("drawContainer").getBoundingClientRect();
+        console.log("col height: ", col.height, "col width: ", col.width);
+        cWidth = col.width;
+        cHeight = col.height;
+        //canvas.width = col.width;
+        //canvas.height = col.width;
+
+        if (cWidth <= cHeight) {
+            canvas.width = cWidth;
+            canvas.height = cWidth;
+        }
+        else if (cWidth > cHeight) {
+            canvas.width = cHeight;
+            canvas.height = cHeight;
+        }
+        else {
+            canvas.height = 300;
+            canvas.width = 300;
+            console.log("an error has occured setting the width and height of the canvas element. Default of 300x300 chosen.")
+        }
+
+        var context = canvas.getContext("2d");
+        const specs = canvas.getBoundingClientRect();
+        // start drawing rectangle
+        context.fillStyle = '#40798C';
+        context.fillRect(0,0, specs.width, specs.height);
+
+    }
+
+    function draw() {
+        var canvas = document.getElementById("monte");
+        var col = document.getElementById("drawContainer").getBoundingClientRect();
+        console.log("col height: ", col.height, "col width: ", col.width);
+        cWidth = col.width;
+        cHeight = col.height;
+        //canvas.width = col.width;
+        //canvas.height = col.width;
+
+        if (cWidth <= cHeight) {
+            canvas.width = cWidth;
+            canvas.height = cWidth;
+        }
+        else if (cWidth > cHeight) {
+            canvas.width = cHeight;
+            canvas.height = cHeight;
+        }
+        else {
+            canvas.height = 300;
+            canvas.width = 300;
+            console.log("an error has occured setting the width and height of the canvas element. Default of 300x300 chosen.")
+        }
+
+        /*
+        if (canvas.getContext) {
+            var ctx = canvas.getContext('2d');
+            // drawing code here
+        } else {
+            // canvas-unsupported code here
+        }*/
+
+        var context = canvas.getContext("2d");
+        const specs = document.getElementById("monte").getBoundingClientRect();
+        // start drawing rectangle
+        context.fillStyle = '#40798C';
+        context.fillRect(0,0, specs.width, specs.height);
+        //context.strokeRect(0,0, specs.width, specs.height);
+        //draw circle
+        context.fillStyle = '#70A9A1';
+        context.beginPath();
+        context.arc(specs.width / 2, specs.height / 2, (specs.width / 2 )- 1, 0 ,2*Math.PI); // Circle!
+        // note: coordinates are relative to its container.
+        context.fill();
+        context.fillStyle = '#00000';
+        context.moveTo(specs.width/2, specs.height/2);
+        context.lineTo(specs.right, specs.height/2);
+        //context.stroke();
+        console.log("in draw " + specs.width);
+    }
+
+    function drawMarker(mouseX, mouseY) {
+        var canvas = document.getElementById("monte");
+        var context = canvas.getContext("2d");
+
+        context.font = "16px Arial Black"
+        context.fillStyle = 'white';
+        context.fillText('x', mouseX, mouseY);
+
+    }
+
+    function checkValid(x, y) {
+        // validates whether the point x, y is inside the box
+        var specs = document.getElementById("monte").getBoundingClientRect();
+        $("#textbox").text("height: " + specs.height + "width: " + specs.width + " top: " + specs.top + " bottom: " + specs.bottom + " left " + specs.left + " right: " + specs.right);
+        //var margin = document.style.margin;
+        return (x > specs.left && y > specs.top && x < specs.right && y < specs.bottom)
+        //return true;
+        //return false;
+
+    }
+
+    function distance(x1, x2, y1, y2) {
+        // returns the distance between (x1, y1) and (x2, y2)
+
+        var leg = x1 - x2;
+        var height = y1 - y2;
+
+        var pythag = (leg * leg) + (height * height);
+        return Math.sqrt(pythag);
+    }
+
+    function finalMonte() {
+        var pie = (4 * parseInt(sessionStorage.getItem('count')));
+        pie = pie / parseInt(sessionStorage.getItem('totalClicks'));
+        $("#monteBox").text("Your calculation for pie is: " + pie);
+    }
+
+    function getMousePos(event) {
+        var mouseX = event.clientX;
+        var mouseY = event.clientY;
+
+        $("#textbox").text("mouse x: " + mouseX + " mouse y: " + mouseY);
+
+        var calc = distance(mouseX, 0, mouseY, 0);
+        $("#distanceText").text("the distance between (" + mouseX + " , " + mouseY + ") and (0, 0) is: " + calc);
+        //$("#distanceText").text("the distance is: " + calc);
+        var v = checkValid(mouseX, mouseY);
+        if (v) {
+            //drawMarker(mouseX, mouseY);
+            //sessionStorage.setItem('totalClicks', parseInt(sessionStorage.getItem('totalClicks')) + 1);
+            var specs = document.getElementById("monte").getBoundingClientRect();
+            var radius = (specs.width / 2);
+            var originX = specs.right - (specs.width / 2);
+            var originY = specs.bottom - (specs.height / 2);
+            var dist = distance(mouseX, originX, mouseY, originY);
+
+            if (dist < radius) {
+                //resumeInfo();
+                // point is inside the circle!!
+                //sessionStorage.setItem('count', parseInt(sessionStorage.getItem('count')) + 1);
+                $("#validBox").text("everything is fine, point is inside circle");
+            }
+            else {
+
+                $("#validBox").text("everything is fine, point is outside circle but inside box ");
+            }
+
+            finalMonte();
+        }
+        else {
+            $("#validBox").text("the point is outside the box");
+        }
+
+        //console.log(sessionStorage);
+
+    }
+</script>
+
+
+</body>
+</html>

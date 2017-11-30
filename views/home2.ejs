@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>%= title %</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
+</head>
+<body>
+
+<div class="column left" id="drawContainer"> <canvas id="monte"></canvas> </div>
+
+<div class="column right">
+
+    <ul class="nav nav-tabs">
+        <li id="liAbout"><a data-toggle="tab" href="#about">About Me</a></li>
+        <li id="liResume"><a data-toggle="tab" href="#resume">Resume</a></li>
+        <li id="liProject"><a data-toggle="tab" href="#projects">Projects</a></li>
+        <li id="liOther"><a data-toggle="tab" href="#other">Other Interests</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="about" class="tab-pane fade">
+            <br>
+            <p>I am currently a Computer Science student at Sonoma State University.</p>
+            <br>
+            <p></p>
+        </div>
+        <div id="resume" class="tab-pane fade">
+            <p></p>
+        </div>
+        <div id="projects" class="tab-pane fade">
+            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+        </div>
+        <div id="other" class="tab-pane fade">
+            <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    draw();
+    function draw() {
+        var canvas = document.getElementById("monte");
+        var col = document.getElementById("drawContainer").getBoundingClientRect();
+        console.log("col height: ", col.height, "col width: ", col.width);
+
+        cWidth = col.width;
+        cHeight = col.height;
+        //canvas.width = col.width;
+        //canvas.height = col.width;
+
+        if (cWidth <= cHeight) {
+            canvas.width = cWidth;
+            canvas.height = cWidth;
+        }
+        else if (cWidth > cHeight) {
+            canvas.width = cHeight;
+            canvas.height = cHeight;
+        }
+        else {
+            canvas.height = 300;
+            canvas.width = 300;
+            console.log("an error has occured setting the width and height of the canvas element. Default of 300x300 chosen.")
+        }
+
+        /*
+        if (canvas.getContext) {
+            var ctx = canvas.getContext('2d');
+            // drawing code here
+        } else {
+            // canvas-unsupported code here
+        }*/
+        var context = canvas.getContext("2d");
+        const specs = canvas.getBoundingClientRect();
+        // start drawing rectangle
+        context.fillStyle = '#76bbd3';
+        context.fillRect(0,0, specs.width, specs.height);
+        //draw circle
+        context.fillStyle = '#4c8ea5';
+        context.beginPath();
+        context.arc(specs.width / 2, specs.height / 2, (specs.width / 2 )- 1, 0 ,2*Math.PI); // Circle!
+        // note: coordinates are relative to its container.
+        context.fill();
+        context.fillStyle = '#00000';
+        context.moveTo(specs.width/2, specs.height/2);
+        context.lineTo(specs.right, specs.height/2);
+        // context.stroke(); put back in if you want to draw the radius
+        console.log("in draw " + specs.width);
+    }
+
+</script>
+
+</body>
+</html>
